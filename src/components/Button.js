@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Color.blueColor,
     borderRadius: 5,
-    marginTop: 50
+    marginTop: 30
   },
-  text: { fontSize: 14, fontWeight: 'bold' },
+  text: { fontSize: 18, fontWeight: 'bold' },
 });
