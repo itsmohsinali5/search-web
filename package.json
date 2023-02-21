@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "country-state-city": "^3.1.2",
     "expo": "~47.0.12",
     "expo-status-bar": "~1.4.2",
     "expo-web-browser": "^12.0.0",
