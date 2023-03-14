@@ -17,9 +17,9 @@ import axios from "axios";
 export const Home = () => {
   const [result, setResult] = useState(null);
   const [pessanger, setPessanger] = useState({
-    adults: null,
-    children: null,
-    infants: null,
+    adults: 0,
+    children: 0,
+    infants: 0,
   });
 
   const [open, setOpen] = useState(false);
@@ -31,12 +31,59 @@ export const Home = () => {
 
   const [departDate, setDepartDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
+  const [searchId, setSearchId] = useState("");
 
   const _handlePressButtonAsync = async () => {
-    let result = await WebBrowser.openBrowserAsync(
-      "https://tp.media/r?marker=408934&trs=209963&p=5976&u=https%3A%2F%2Fwayaway.io&campaign_id=200"
-    );
-    setResult(result);
+    let data = {
+      signature: "d559fd4a48d87998008f9cf54bd1fd7c",
+      marker: "408934",
+      host: "beta.aviasales.com",
+      user_ip: "127.0.0.1",
+      locale: "en",
+      trip_class: "Y",
+      passengers: {
+        adults: pessanger.adults,
+        children: pessanger.children,
+        infants: pessanger.infants,
+      },
+      segments: [
+        {
+          origin: "LAX",
+          destination: "NYC",
+          date: "2023-05-25",
+        },
+        {
+          origin: "NYC",
+          destination: "LAX",
+          date: "2023-06-18",
+        },
+      ],
+    };
+
+    var myHeaders = new Headers();
+    var requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: JSON.stringify(data),
+      redirect: "follow",
+    };
+    await fetch(`http://api.travelpayouts.com/v1/flight_search`, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        setSearchId(result.search_id);
+      });
+    console.log("ID=====", searchId);
+    const request = {
+      method: "GET",
+    };
+    await fetch(
+      `http://api.travelpayouts.com/v1/flight_search_results?uuid=${searchId}`,
+      request
+    )
+      .then((res) => res.json())
+      .then((result) => {
+        // console.log("result====", result);
+      });
   };
 
   useEffect(() => {
@@ -60,47 +107,42 @@ export const Home = () => {
 
       <View style={{ width: "90%" }}>
         <Text style={{ ...styles.text, marginTop: 10 }}>Origin</Text>
-        <View style={{ zIndex: 1, marginTop: 10 }}>
-          <DropDownPicker
-            open={open}
-            value={drafting}
-            items={
-              items &&
-              items.map((item) => ({
-                label: `${item?.name} (${item?.city_code})`,
-                value: item?.city_code,
-              }))
-            }
-            setOpen={setOpen}
-            setValue={setDrafting}
-            placeholder="Required Origin"
-            placeholderStyle={styles.placeholderStyles}
-            style={styles.dropDown}
-            searchable={true}
-          />
-        </View>
+        <DropDownPicker
+          open={open}
+          value={drafting}
+          items={
+            items &&
+            items.map((item) => ({
+              label: `${item?.name} (${item?.city_code})`,
+              value: item?.city_code,
+            }))
+          }
+          setOpen={setOpen}
+          setValue={setDrafting}
+          placeholder="Required Origin"
+          placeholderStyle={styles.placeholderStyles}
+          style={styles.dropDown}
+          searchable={true}
+        />
 
         <Text style={{ ...styles.text, marginTop: 20 }}>Destination</Text>
-        <View style={{ zIndex: open ? 0 : 1, marginTop: 10 }}>
-          <DropDownPicker
-            open={openDes}
-            value={draftingDes}
-            dropDownContainerStyle={{ backgroundColor: "white", zIndex: 999 }}
-            items={
-              items &&
-              items.map((item) => ({
-                label: `${item?.name} (${item?.city_code})`,
-                value: item?.city_code,
-              }))
-            }
-            setOpen={setOpenDes}
-            setValue={setDraftingDes}
-            placeholder="Required Destination"
-            placeholderStyle={styles.placeholderStyles}
-            style={styles.dropDown}
-            searchable={true}
-          />
-        </View>
+        <DropDownPicker
+          open={openDes}
+          value={draftingDes}
+          items={
+            items &&
+            items.map((item) => ({
+              label: `${item?.name} (${item?.city_code})`,
+              value: item?.city_code,
+            }))
+          }
+          setOpen={setOpenDes}
+          setValue={setDraftingDes}
+          placeholder="Required Destination"
+          placeholderStyle={styles.placeholderStyles}
+          style={styles.dropDown}
+          searchable={true}
+        />
 
         <View
           style={{
